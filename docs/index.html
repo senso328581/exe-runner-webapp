@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exe Runner</title>
+</head>
+<body>
+  <h1>Exe Runner</h1>
+  <form id="upload-form">
+    <input type="file" name="exe" accept=".exe" required />
+    <button type="submit">実行</button>
+  </form>
+  <pre id="result"></pre>
+
+  <script>
+    document.getElementById('upload-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const res = await fetch('/run', { method: 'POST', body: formData });
+      const json = await res.json();
+      document.getElementById('result').innerText =
+        `Exit Code: ${json.exitCode}\n` + json.output;
+    });
+  </script>
+</body>
+</html>
