@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exe Runner</title>
+  <title>Exe/APK Runner</title>
 </head>
 <body>
-  <h1>Exe Runner</h1>
-  <form id="upload-form">
-    <input type="file" name="exe" accept=".exe" required />
+  <h1>Exe/APK Runner</h1>
+  <form id="upload-form" enctype="multipart/form-data" method="post" action="/run">
+    <input type="file" name="file" accept=".exe,.apk" required />
     <button type="submit">実行</button>
   </form>
   <pre id="result"></pre>
@@ -16,11 +16,16 @@
   <script>
     document.getElementById('upload-form').addEventListener('submit', async e => {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const res = await fetch('/run', { method: 'POST', body: formData });
-      const json = await res.json();
-      document.getElementById('result').innerText =
-        `Exit Code: ${json.exitCode}\n` + json.output;
+      const form = e.target;
+      const data = new FormData(form);
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: data });
+        const json = await res.json();
+        document.getElementById('result').innerText =
+          json.error ? json.error : `Exit Code: ${json.exitCode}\n` + json.output;
+      } catch (err) {
+        document.getElementById('result').innerText = '通信エラー: ' + err;
+      }
     });
   </script>
 </body>
